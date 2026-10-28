@@ -1,0 +1,222 @@
+{
+  "project": {
+    "title": "Validasi duplicate vendor invoice",
+    "tcode": "MIRO",
+    "description": "Tambahkan validasi untuk mendeteksi invoice duplikat berdasarkan kombinasi Vendor ID, Invoice Reference, dan Invoice Date.",
+    "requirements": "Invoice dengan Vendor ID, Invoice Reference, dan Invoice Date yang sama terdeteksi sebagai duplikat.\nInvoice dengan kombinasi unik dapat melanjutkan proses yang berlaku.\nValidasi lain pada proses invoice tetap berjalan setelah enhancement.",
+    "context": "Contoh untuk diskusi. Respons duplikat (error/warning), trigger validasi, cakupan company code, normalisasi reference, field kosong, dan status invoice pembanding belum ditentukan.",
+    "level": "Both"
+  },
+  "result": {
+    "scenarios": [
+      {
+        "id": "MIRO-01",
+        "title": "Invoice baru dengan kombinasi unik",
+        "test_type": "Positive",
+        "level": "UT",
+        "data": "Vendor V1; Ref INV-101; Date 10-Oct. Tidak ada kombinasi yang sama.",
+        "steps": "Siapkan data pembanding.\nMasukkan kombinasi unik di MIRO.\nJalankan aksi yang memicu validasi sesuai spesifikasi.",
+        "expected": "Validasi duplikat tidak menandai kombinasi unik. Proses mengikuti validasi lain yang berlaku.",
+        "requirement_ids": [
+          "REQ-02"
+        ],
+        "remarks": "Trigger validasi perlu dikonfirmasi.",
+        "actual": "",
+        "status": "Not run",
+        "review": "Draft",
+        "source": "Demo MIRO"
+      },
+      {
+        "id": "MIRO-02",
+        "title": "Duplikat dengan tiga field yang sama",
+        "test_type": "Negative",
+        "level": "UT",
+        "data": "Invoice pembanding V1 / INV-101 / 10-Oct. Input kombinasi identik.",
+        "steps": "Siapkan invoice pembanding dalam status yang disepakati.\nMasukkan kombinasi yang sama.\nPicu validasi.",
+        "expected": "Kombinasi terdeteksi sebagai duplikat. Respons error/warning dan apakah posting diblokir perlu dikonfirmasi.",
+        "requirement_ids": [
+          "REQ-01"
+        ],
+        "remarks": "Jangan menyimpulkan posting diblokir sebelum requirement disetujui.",
+        "actual": "",
+        "status": "Not run",
+        "review": "Needs clarification",
+        "source": "Demo MIRO"
+      },
+      {
+        "id": "MIRO-03",
+        "title": "Vendor sama, reference berbeda",
+        "test_type": "Positive",
+        "level": "UT",
+        "data": "Pembanding V1 / INV-101 / 10-Oct; input V1 / INV-102 / 10-Oct.",
+        "steps": "Siapkan pembanding.\nUbah hanya reference.\nPicu validasi.",
+        "expected": "Kombinasi tidak dianggap duplikat berdasarkan aturan tiga field yang sama; validasi lain tetap berlaku.",
+        "requirement_ids": [
+          "REQ-01",
+          "REQ-02"
+        ],
+        "remarks": "Variasi kombinasi, bukan boundary numerik.",
+        "actual": "",
+        "status": "Not run",
+        "review": "Draft",
+        "source": "Demo MIRO"
+      },
+      {
+        "id": "MIRO-04",
+        "title": "Vendor dan reference sama, tanggal berbeda",
+        "test_type": "Positive",
+        "level": "UT",
+        "data": "Pembanding V1 / INV-101 / 10-Oct; input V1 / INV-101 / 11-Oct.",
+        "steps": "Siapkan pembanding.\nUbah hanya invoice date.\nPicu validasi.",
+        "expected": "Kombinasi tidak dianggap duplikat berdasarkan requirement contoh; konfirmasi bahwa tidak ada aturan lintas tanggal tambahan.",
+        "requirement_ids": [
+          "REQ-01",
+          "REQ-02"
+        ],
+        "remarks": "Requirement tanggal tambahan belum tersedia.",
+        "actual": "",
+        "status": "Not run",
+        "review": "Needs clarification",
+        "source": "Demo MIRO"
+      },
+      {
+        "id": "MIRO-05",
+        "title": "Reference dan tanggal sama, vendor berbeda",
+        "test_type": "Positive",
+        "level": "UT",
+        "data": "Pembanding V1 / INV-101 / 10-Oct; input V2 / INV-101 / 10-Oct.",
+        "steps": "Siapkan pembanding.\nUbah hanya vendor.\nPicu validasi.",
+        "expected": "Kombinasi tidak dianggap duplikat menurut aturan tiga field yang sama; validasi lain tetap berlaku.",
+        "requirement_ids": [
+          "REQ-01",
+          "REQ-02"
+        ],
+        "remarks": "Pastikan kedua vendor valid untuk data uji.",
+        "actual": "",
+        "status": "Not run",
+        "review": "Draft",
+        "source": "Demo MIRO"
+      },
+      {
+        "id": "MIRO-06",
+        "title": "Vendor ID kosong",
+        "test_type": "Negative",
+        "level": "UT",
+        "data": "Vendor kosong; reference dan tanggal terisi.",
+        "steps": "Kosongkan vendor melalui jalur input yang diizinkan.\nAmati validasi field dan validasi enhancement.",
+        "expected": "Perlu konfirmasi: aturan field wajib dan urutan validasi belum ditentukan. Jangan menganggap invoice boleh diproses.",
+        "requirement_ids": [],
+        "remarks": "Kandidat tambahan; aturan belum tersedia.",
+        "actual": "",
+        "status": "Not run",
+        "review": "Needs clarification",
+        "source": "Demo MIRO"
+      },
+      {
+        "id": "MIRO-07",
+        "title": "Invoice Reference kosong",
+        "test_type": "Negative",
+        "level": "UT",
+        "data": "Vendor dan tanggal terisi; reference kosong.",
+        "steps": "Kosongkan reference.\nPicu validasi pada titik yang disepakati.",
+        "expected": "Perlu konfirmasi: apakah ditolak, diperingatkan, atau mengikuti aturan lain.",
+        "requirement_ids": [],
+        "remarks": "Kandidat tambahan; aturan belum tersedia.",
+        "actual": "",
+        "status": "Not run",
+        "review": "Needs clarification",
+        "source": "Demo MIRO"
+      },
+      {
+        "id": "MIRO-08",
+        "title": "Invoice Date kosong",
+        "test_type": "Negative",
+        "level": "UT",
+        "data": "Vendor dan reference terisi; invoice date kosong.",
+        "steps": "Uji input tanggal kosong jika jalur input memungkinkan.\nAmati hasil validasi.",
+        "expected": "Perlu konfirmasi: penanganan tanggal kosong dan nilai default belum tersedia.",
+        "requirement_ids": [],
+        "remarks": "Kandidat tambahan; aturan belum tersedia.",
+        "actual": "",
+        "status": "Not run",
+        "review": "Needs clarification",
+        "source": "Demo MIRO"
+      },
+      {
+        "id": "MIRO-09",
+        "title": "Variasi huruf dan spasi pada reference",
+        "test_type": "Boundary",
+        "level": "UT",
+        "data": "INV-101, inv-101, dan ' INV-101 ' dengan vendor/tanggal identik.",
+        "steps": "Uji tiap variasi secara terpisah.\nCatat cara sistem membandingkan reference.",
+        "expected": "Perlu konfirmasi: aturan trim dan case sensitivity sebelum menetapkan pass/fail.",
+        "requirement_ids": [],
+        "remarks": "Boundary representasi teks; bukan klaim perilaku standar SAP.",
+        "actual": "",
+        "status": "Not run",
+        "review": "Needs clarification",
+        "source": "Demo MIRO"
+      },
+      {
+        "id": "MIRO-10",
+        "title": "Alur bisnis invoice valid end-to-end",
+        "test_type": "Regression",
+        "level": "UAT",
+        "data": "Data invoice valid yang telah disetujui sebagai baseline.",
+        "steps": "Jalankan alur invoice baseline bersama business user.\nBandingkan dokumen dan hasil proses dengan baseline yang disetujui.",
+        "expected": "Hasil bisnis invoice valid sesuai baseline dan validasi lain tetap berjalan.",
+        "requirement_ids": [
+          "REQ-02",
+          "REQ-03"
+        ],
+        "remarks": "Gunakan baseline perusahaan; expected accounting detail belum diberikan.",
+        "actual": "",
+        "status": "Not run",
+        "review": "Draft",
+        "source": "Demo MIRO"
+      },
+      {
+        "id": "MIRO-11",
+        "title": "User menangani invoice duplikat",
+        "test_type": "Negative",
+        "level": "UAT",
+        "data": "Invoice pembanding dan input duplikat yang disetujui.",
+        "steps": "Business user memasukkan invoice duplikat.\nAmati deteksi dan respons.\nValidasi langkah tindak lanjut user.",
+        "expected": "Duplikat terdeteksi. Pesan dan langkah perbaikan harus dikonfirmasi dengan process owner.",
+        "requirement_ids": [
+          "REQ-01"
+        ],
+        "remarks": "Acceptance criteria respons user belum lengkap.",
+        "actual": "",
+        "status": "Not run",
+        "review": "Needs clarification",
+        "source": "Demo MIRO"
+      },
+      {
+        "id": "MIRO-12",
+        "title": "Validasi lama tetap aktif",
+        "test_type": "Regression",
+        "level": "UT",
+        "data": "Kasus gagal dari baseline validasi lama, tanpa duplikasi.",
+        "steps": "Jalankan ulang kasus gagal baseline.\nBandingkan dengan hasil sebelum enhancement.",
+        "expected": "Validasi lama menghasilkan respons yang sama dengan baseline yang disetujui.",
+        "requirement_ids": [
+          "REQ-03"
+        ],
+        "remarks": "Daftar validasi lama harus disediakan reviewer.",
+        "actual": "",
+        "status": "Not run",
+        "review": "Draft",
+        "source": "Demo MIRO"
+      }
+    ],
+    "questions": [
+      "Apa trigger validasi: simulate, save, park, atau post?",
+      "Apakah duplikat menghasilkan error, warning, atau memblokir posting?",
+      "Apakah pembandingan dibatasi company code dan mencakup invoice parked/reversed?",
+      "Bagaimana field kosong, huruf besar/kecil, dan spasi reference diperlakukan?",
+      "Bagaimana dua invoice identik yang diproses bersamaan ditangani?"
+    ],
+    "summary": "Contoh kurasi lokal MIRO. Bukan hasil pemrosesan AI atau bukti coverage lengkap."
+  }
+}
